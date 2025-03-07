@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+.dark {
+  --foreground-rgb: 255, 233, 214;
+  --background-start-rgb: 28, 16, 10;
+  --background-end-rgb: 18, 10, 5;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+/* Dark mode specific styles */
+.dark .bg-brown-100 {
+  background-color: rgb(60, 40, 25);
+}
+
+.dark .bg-white {
+  background-color: rgb(80, 60, 40); 
+}
+
+.dark .bg-brown-800 {
+  background-color: rgb(18, 10, 5); 
+}
+
+.dark .text-brown-800 {
+  color: rgb(255, 233, 214);
+}
+
+.dark .text-brown-600 {
+  color: rgb(220, 200, 180); 
+}
+
+.dark .text-brown-200 {
+  color: rgb(180, 160, 140); 
+}
