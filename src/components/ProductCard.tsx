@@ -32,7 +32,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.description.substring(0, 60)}...
           </p>
           <p className="mt-3 text-xl font-bold text-brown-800 dark:text-brown-200">
-            ${product.price.toFixed(2)}
+            ₱{product.price.toFixed(2)}
           </p>
         </div>
       </Link>

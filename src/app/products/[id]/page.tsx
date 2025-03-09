@@ -1,16 +1,34 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { products } from "@/data/product";
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
-  // Await params to ensure it's resolved
-  const { id } = await params;
+export default async function ProductPage({ params }: { params: Promise<{ id?: string }> }) {
+  const resolvedParams = await params;
+  if (!resolvedParams?.id) return notFound();
 
-  // Fetch the product dynamically
-  const product = products.find((p) => p.id === id);
+  const id = Array.isArray(resolvedParams.id) ? resolvedParams.id[0] : resolvedParams.id;
 
-  // If product not found, show a 404 page
+  // Fetch categories
+  const res = await fetch("http://localhost:3001/categories", { cache: "no-store" });
+
+  if (!res.ok) return notFound();
+
+  const categories = await res.json();
+  let product: any = null;
+  let categoryName: string | null = null;
+  let categoryId: string | null = null;
+
+  // Find product in categories
+  for (const category of categories) {
+    const foundProduct = category.products.find((p: any) => p.id === id);
+    if (foundProduct) {
+      product = foundProduct;
+      categoryName = category.name;
+      categoryId = category.id;
+      break;
+    }
+  }
+
   if (!product) return notFound();
 
   return (
@@ -19,7 +37,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
         {/* Product Image */}
         <div className="md:w-1/3 mb-6 md:mb-0 flex items-center justify-center">
           <Image
-            src={product.image || "/"}
+            src={product.image || "/placeholder.jpg"}
             alt={product.name}
             width={300}
             height={300}
@@ -56,9 +74,9 @@ export default async function ProductPage({ params }: { params: { id: string } }
               {product.inStock ? "In Stock" : "Out of Stock"}
             </span>
 
-            <Link href={`/category/${product.category}`}>
+            <Link href={`/category/${categoryId}`}>
               <span className="px-4 py-2 rounded-full text-sm font-medium bg-brown-400 dark:bg-brown-700 text-brown-900 dark:text-brown-200">
-                {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+                {categoryName}
               </span>
             </Link>
           </div>
@@ -92,7 +110,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
       <div className="mt-12">
         <h2 className="text-2xl font-semibold text-brown-900 dark:text-brown-300 mb-4">Features</h2>
         <ul className="list-disc pl-6 space-y-2 text-brown-800 dark:text-brown-400">
-          {product.features.map((feature, index) => (
+          {product.features.map((feature: string, index: number) => (
             <li key={index}>{feature}</li>
           ))}
         </ul>
