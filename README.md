@@ -4,10 +4,10 @@ A modern, responsive product catalog built with Next.js, featuring Server-Side R
 
 ## 🌟 Features
 ✅ Dynamic Routing (`/products/[id]` and `/category/[id]`)  
-✅ Server-Side Rendering (SSR)
+✅ Server-Side Rendering (SSR)  
 ✅ Dark Mode Toggle 🌙  
 ✅ Interactive Hover Effects & Smooth Animations  
-✅ Minimalist Navbar & Footer 
+✅ Minimalist Navbar & Footer  
 ✅ Local JSON Server for product data  
 
 ## 🚀 Getting Started
