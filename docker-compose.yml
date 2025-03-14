@@ -1,0 +1,28 @@
+services:
+  frontend:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mock-api
+    environment:
+      - NEXT_PUBLIC_API_URL=http://mock-api:8000
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: "npm run dev"
+    networks:
+      - app-network
+
+  mock-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.mock-api  # Build from custom Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

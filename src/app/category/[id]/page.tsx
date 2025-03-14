@@ -1,60 +1,53 @@
-"use client";
-
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { notFound } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 
-export default function CategoryPage() {
-  const params = useParams();
-  const [category, setCategory] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+// ✅ Define type for page props (Fixed)
+interface PageProps {
+  params: Promise<{ id?: string }>;
+}
 
-  useEffect(() => {
-    async function fetchCategoryData() {
-      if (!params?.id) return;
+// ✅ Define Category & Product Types
+interface Product {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+  price: number;
+}
 
-      const id = Array.isArray(params.id) ? params.id[0] : params.id;
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+  products: Product[];
+}
 
-      try {
-        const res = await fetch("http://localhost:3001/categories", { cache: "no-store" });
+// ✅ API Base URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://mock-api:8000";
 
-        if (!res.ok) {
-          setCategory(null);
-          return;
-        }
+// ✅ Fetch category data
+async function getCategoryData(id: string): Promise<Category | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/categories`, { cache: "no-store" });
 
-        const categories = await res.json();
-        const foundCategory = categories.find(
-          (cat: any) => typeof cat.id === "string" && cat.id.toLowerCase() === id?.toLowerCase()
-        );
+    if (!res.ok) return null;
 
-        setCategory(foundCategory || null);
-      } catch (error) {
-        console.error("Error fetching category data:", error);
-        setCategory(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchCategoryData();
-  }, [params?.id]);
-
-  if (loading) {
-    return (
-      <main className="container mx-auto px-6 py-10">
-        <h1 className="text-4xl font-bold text-brown-800 dark:text-brown-200 mb-6">Loading...</h1>
-      </main>
-    );
+    const categories: Category[] = await res.json();
+    return categories.find((cat) => cat.id.toLowerCase() === id.toLowerCase()) || null;
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    return null;
   }
+}
 
-  if (!category) {
-    return (
-      <main className="container mx-auto px-6 py-10">
-        <h1 className="text-4xl font-bold text-center text-red-500">Category Not Found</h1>
-      </main>
-    );
-  }
+// ✅ Main Page Component (Fixed)
+export default async function CategoryPage({ params }: PageProps) {
+  const resolvedParams = await params; // Fix to match Product Page pattern
+  if (!resolvedParams?.id) return notFound();
+
+  const id = Array.isArray(resolvedParams.id) ? resolvedParams.id[0] : resolvedParams.id;
+  const category = await getCategoryData(id);
+  if (!category) return notFound();
 
   return (
     <main className="container mx-auto px-6 py-10">
@@ -69,7 +62,7 @@ export default function CategoryPage() {
         </h2>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {category.products.map((product: any) => (
+          {category.products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

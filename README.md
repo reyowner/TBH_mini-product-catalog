@@ -1,4 +1,4 @@
-# 🛍️ TBH Mini Product Catalog
+# 🛍️ TBH Mini Product Catalog (Dockerized Version)
 
 A modern, responsive product catalog built with Next.js, featuring Server-Side Rendering (SSR), a dark mode toggle, and smooth animations. Designed with a coffee-themed brown aesthetic and powered by Tailwind CSS.
 
@@ -8,9 +8,9 @@ A modern, responsive product catalog built with Next.js, featuring Server-Side R
 ✅ Dark Mode Toggle 🌙  
 ✅ Interactive Hover Effects & Smooth Animations  
 ✅ Minimalist Navbar & Custom Button Design  
-✅ Local JSON Server for product data  
+✅ Local JSON Server for product data (Dockerized)
 
-## 🚀 Getting Started
+## 🚀 Getting Started (Dockerized Setup)
 
 # 1️⃣ Clone the Repository
 ```bash
@@ -19,25 +19,41 @@ cd TBH_mini-product-catalog
 ```
 
 # 2️⃣ Install Dependencies
-Make sure you have Node.js installed, then run:
+Ensure Docker is installed on your machine. If not, download and install it from [Docker's official website](https://www.docker.com/products/docker-desktop/)
+
+# 3️⃣ Build and Run the Containers
+Use docker-compose to build and start the frontend and mock API containers.
 ```bash
-npm install
+docker-compose up -d --build
+```
+This command will:
+✅ Build the Next.js frontend container
+✅ Build the JSON Server (mock API) container
+✅ Start both containers in detached mode (-d)
+
+# 4️⃣ Verify Running Containers
+To check if the containers are running correctly, use:
+```bash
+docker ps
+```
+You should see two running containers:
+```bash
+CONTAINER ID   IMAGE                       COMMAND                  PORTS                    NAMES
+xxxxx          tbh_mini-product-frontend   "docker-entrypoint.s…"   0.0.0.0:3000->3000/tcp   tbh_mini-product-frontend
+xxxxx          tbh-mock-api                "json-server --watch…"   0.0.0.0:8000->8000/tcp   tbh-mock-api
 ```
 
-# 3️⃣ Start the JSON Server
-Before running the development server, start the local JSON server to serve product data from db.json:
+# 5️⃣ Access the Application
+Once the containers are running, open the application in your browser:
+🔗 Frontend: [http://localhost:3000](http://localhost:3000)
+🔗 Mock API: [http://localhost:8000/categories](http://localhost:8000/categories) (to test API responses)
+
+# 🛑 Stopping the Application
+To stop the running containers, use:
 ```bash
-npx json-server --watch db.json --port 3001
+docker-compose down
 ```
-This runs a mock API at http://localhost:3001, which our Next.js app fetches data from.
-
-# 4️⃣ Run the Development Server
-```bash
-npm run dev
-```
-
-# Now, open [http://localhost:3000](http://localhost:3000) in your browser.
-
+This will gracefully shut down the services.
 
 ## 🛠️ Tech Stack
 - Next.js 14 (App Router)
@@ -45,10 +61,5 @@ npm run dev
 - Tailwind CSS (via CDN)
 - TypeScript
 - Server-Side Rendering (SSR)
-- JSON Server (for local API)
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- JSON Server (Mock API)
+- Docker & Docker Compose

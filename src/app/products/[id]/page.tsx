@@ -2,34 +2,61 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function ProductPage({ params }: { params: Promise<{ id?: string }> }) {
+// ✅ Define type for page props
+interface PageProps {
+  params: Promise<{ id?: string }>;
+}
+
+// ✅ Define type for Product
+interface Product {
+  id: string;
+  name: string;
+  image: string;
+  rating: number;
+  price: number;
+  inStock: boolean;
+  description: string;
+  origin?: string;
+  roastLevel?: string;
+  weight?: number;
+  features: string[];
+}
+
+// ✅ API Base URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://mock-api:8000";
+
+// ✅ Fetch product data
+async function getProductData(id: string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/categories`, { cache: "no-store" });
+
+    if (!res.ok) return null;
+
+    const categories = await res.json();
+    for (const category of categories) {
+      const foundProduct = category.products.find((p: Product) => p.id === id);
+      if (foundProduct) {
+        return { product: foundProduct, categoryName: category.name, categoryId: category.id };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return null;
+  }
+}
+
+// ✅ Main Page Component (Fixed)
+export default async function ProductPage({ params }: PageProps) {
   const resolvedParams = await params;
   if (!resolvedParams?.id) return notFound();
 
   const id = Array.isArray(resolvedParams.id) ? resolvedParams.id[0] : resolvedParams.id;
+  const data = await getProductData(id);
+  if (!data) return notFound();
 
-  // Fetch categories
-  const res = await fetch("http://localhost:3001/categories", { cache: "no-store" });
-
-  if (!res.ok) return notFound();
-
-  const categories = await res.json();
-  let product: any = null;
-  let categoryName: string | null = null;
-  let categoryId: string | null = null;
-
-  // Find product in categories
-  for (const category of categories) {
-    const foundProduct = category.products.find((p: any) => p.id === id);
-    if (foundProduct) {
-      product = foundProduct;
-      categoryName = category.name;
-      categoryId = category.id;
-      break;
-    }
-  }
-
-  if (!product) return notFound();
+  const { product, categoryName, categoryId } = data;
 
   return (
     <div className="bg-gray-200 dark:bg-gray-900 rounded-xl shadow-2xl p-8 md:p-10 transition-all duration-300 border border-gray-400 dark:border-gray-800">
